@@ -1,0 +1,452 @@
+
+html_code = '''<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Навигатор садовода — умное планирование дачного участка</title>
+  <meta name="description" content="Автономное приложение для садоводов: планирование участка, расчёт теней, севооборот, умный календарь. Основные функции работают без интернета!">
+  <meta property="og:title" content="Навигатор садовода">
+  <meta property="og:description" content="Умное планирование дачного участка с расчётом теней и севооборотом">
+  <meta property="og:image" content="https://yourusername.github.io/navigator-sadovoda-landing/icon.png">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/png" href="icon.png">
+  <style>
+    :root {
+      --navy: #1a2f4a;
+      --navy-light: #2a4a6f;
+      --green: #2d8a2d;
+      --green-light: #4caf50;
+      --mint: #d4f5d4;
+      --cream: #f8faf8;
+      --text: #1a2f4a;
+      --muted: #5a6f7a;
+      --card: #ffffff;
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; color: var(--text); line-height: 1.6; background: var(--cream); }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 960px; margin: 0 auto; padding: 24px; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 48px 24px 56px; background: linear-gradient(160deg, var(--navy) 0%, var(--navy-light) 50%, var(--green) 100%); color: white; border-radius: var(--radius); margin-bottom: 40px; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); pointer-events: none; }
+    .hero-icon { width: 180px; height: 180px; border-radius: 40px; margin: 0 auto 24px; display: block; box-shadow: 0 16px 48px rgba(0,0,0,0.3); animation: float 4s ease-in-out infinite; position: relative; z-index: 1; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero h1 { font-size: 2.4rem; margin-bottom: 12px; font-weight: 800; letter-spacing: -0.5px; position: relative; z-index: 1; }
+    .hero p { font-size: 1.15rem; max-width: 560px; margin: 0 auto 28px; opacity: 0.92; position: relative; z-index: 1; }
+    .btn { display: inline-block; background: white; color: var(--navy); padding: 14px 36px; border-radius: 99px; font-weight: 700; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: none; cursor: pointer; font-size: 1rem; transition: all 0.2s; position: relative; z-index: 1; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.25); }
+
+    /* Sections */
+    .section-title { font-size: 1.6rem; font-weight: 700; margin: 48px 0 24px; text-align: center; color: var(--navy); }
+
+    /* Features — 2 per row on desktop */
+    .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 48px; }
+    .feature { background: var(--card); padding: 28px; border-radius: var(--radius); box-shadow: 0 2px 12px rgba(26,47,74,0.06); border: 1px solid rgba(26,47,74,0.04); transition: transform 0.2s; }
+    .feature:hover { transform: translateY(-4px); }
+    .feature-icon { font-size: 2rem; margin-bottom: 12px; }
+    .feature h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--navy); }
+    .feature p { font-size: 0.95rem; color: var(--muted); }
+
+    /* Pricing toggle */
+    .toggle { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; background: var(--mint); padding: 6px; border-radius: 99px; width: fit-content; margin-left: auto; margin-right: auto; }
+    .toggle button { border: none; background: transparent; padding: 10px 22px; border-radius: 99px; font-weight: 600; cursor: pointer; color: var(--navy); font-size: 0.95rem; transition: all 0.2s; }
+    .toggle button.active { background: white; color: var(--navy); box-shadow: 0 2px 8px rgba(26,47,74,0.1); }
+
+    /* Pricing cards */
+    .pricing { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 48px; }
+    .card { background: var(--card); border-radius: var(--radius); padding: 32px; box-shadow: 0 2px 12px rgba(26,47,74,0.06); display: flex; flex-direction: column; position: relative; overflow: hidden; border: 1px solid rgba(26,47,74,0.04); }
+    .card.popular { border: 2px solid var(--green); box-shadow: 0 4px 20px rgba(45,138,45,0.1); }
+    .popular-badge { position: absolute; top: 14px; right: -30px; background: var(--green); color: white; padding: 4px 36px; font-size: 0.75rem; font-weight: 700; transform: rotate(35deg); }
+    .card h3 { font-size: 1.3rem; margin-bottom: 4px; color: var(--navy); }
+    .subtitle { font-size: 0.9rem; color: var(--muted); margin-bottom: 16px; }
+    .price { font-size: 2.4rem; font-weight: 800; color: var(--green); margin: 8px 0; }
+    .price .period { font-size: 0.95rem; font-weight: 500; color: var(--muted); }
+    .card ul { list-style: none; margin: 20px 0 28px; flex-grow: 1; }
+    .card li { padding: 6px 0; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+    .card li::before { content: "✓"; color: var(--green); font-weight: 700; }
+    .cta { display: block; text-align: center; background: var(--mint); color: var(--navy); padding: 14px; border-radius: 12px; font-weight: 700; transition: all 0.2s; border: none; cursor: pointer; font-size: 1rem; }
+    .card.popular .cta { background: var(--green); color: white; }
+    .cta:hover { opacity: 0.9; transform: translateY(-1px); }
+    .cta:disabled { opacity: 0.6; cursor: wait; }
+
+    /* Footer & docs */
+    .footer { text-align: center; padding: 40px 24px; background: white; border-radius: var(--radius); box-shadow: 0 2px 12px rgba(26,47,74,0.06); margin-bottom: 24px; }
+    .footer h4 { margin-bottom: 12px; color: var(--navy); }
+    .footer p { margin: 4px 0; color: var(--muted); font-size: 0.95rem; }
+    .footer a { color: var(--green); font-weight: 600; }
+    .docs { display: flex; justify-content: center; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+    .docs a { font-size: 0.9rem; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+    /* Legal sections */
+    .legal { background: white; padding: 32px; border-radius: var(--radius); margin-bottom: 24px; box-shadow: 0 2px 12px rgba(26,47,74,0.06); }
+    .legal h2 { font-size: 1.2rem; color: var(--navy); margin-bottom: 16px; }
+    .legal h3 { font-size: 1rem; color: var(--navy); margin: 20px 0 10px; font-weight: 600; }
+    .legal h4 { font-size: 0.95rem; color: var(--navy); margin: 16px 0 8px; font-weight: 600; }
+    .legal p, .legal li { font-size: 0.9rem; color: var(--muted); margin-bottom: 8px; line-height: 1.7; }
+    .legal ol, .legal ul { padding-left: 20px; margin-bottom: 12px; }
+    .legal ul { list-style: disc; }
+    .legal ul li { margin-bottom: 4px; }
+    .legal strong { color: var(--text); }
+    .anchor { display: block; position: relative; top: -80px; visibility: hidden; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--navy); color: white; padding: 14px 28px; border-radius: 12px; font-weight: 600; opacity: 0; transition: all 0.3s; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero-icon { width: 140px; height: 140px; }
+      .price { font-size: 2rem; }
+      .pricing { grid-template-columns: 1fr; }
+      .features { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Hero -->
+  <div class="hero">
+    <img src="icon.png" alt="Навигатор садовода" class="hero-icon">
+    <h1>Навигатор садовода</h1>
+    <p>Умное планирование участка, расчёт теней, севооборот и персональный календарь ухода — большинство функций работают даже без интернета.</p>
+    <a class="btn" href="#pricing">Выбрать тариф</a>
+  </div>
+
+  <!-- Features -->
+  <h2 class="section-title">Возможности</h2>
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">☀️</div>
+      <h3>Тепловая карта солнца</h3>
+      <p>Точный расчёт освещённости и теней от построек для каждого часа дня.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📅</div>
+      <h3>Умный календарь</h3>
+      <p>Автоматические задачи по поливу, подкормке и сбору урожая с учётом погоды.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔄</div>
+      <h3>Севооборот</h3>
+      <p>Алгоритм предупреждает, если вы сажаете культуру на «родственное» место.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📦</div>
+      <h3>Склад и дневник</h3>
+      <p>Учёт семян и инвентаря. Автоматический списание при посадке.</p>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <h2 class="section-title" id="pricing">Тарифы</h2>
+  <div class="toggle">
+    <button onclick="setPeriod('month')" id="btn-month">Месяц</button>
+    <button onclick="setPeriod('season')" id="btn-season" class="active">Сезон</button>
+    <button onclick="setPeriod('year')" id="btn-year">Год</button>
+  </div>
+
+  <div class="pricing">
+    <div class="card">
+      <h3>Фримиум</h3>
+      <div class="subtitle">Для тех, кто только начинает</div>
+      <div class="price" data-month="0 ₽" data-season="0 ₽" data-year="0 ₽">0 ₽<span class="period">/сезон</span></div>
+      <ul>
+        <li>1 участок до 5 соток</li>
+        <li>До 10 объектов на карте</li>
+        <li>15 культур из справочника</li>
+        <li>Базовый календарь ухода</li>
+        <li>Ручные задачи и напоминания</li>
+        <li>Работа без интернета</li>
+      </ul>
+      <button class="cta" disabled style="background: #e9ecef; color: #6c757d; cursor: not-allowed;">Уже включено</button>
+    </div>
+    
+    <div class="card">
+      <h3>Стандарт</h3>
+      <div class="subtitle">Для активного дачника</div>
+      <div class="price" data-month="99 ₽" data-season="159 ₽" data-year="849 ₽">159 ₽<span class="period">/сезон</span></div>
+      <ul>
+        <li>Участок до 15 соток</li>
+        <li>До 30 объектов на карте</li>
+        <li>Тепловая карта — знаем, где светло (до 5 новых расчётов в месяц)</li>
+        <li>Прогноз дождя — не поливаем зря</li>
+        <li>Склад до 100 объектов</li>
+        <li>Предупреждения о севообороте</li>
+        <li>Дневник урожая (1 фото на запись)</li>
+      </ul>
+      <button class="cta" onclick="pay('standard')">Оформить</button>
+    </div>
+
+    <div class="card popular">
+      <div class="popular-badge">ПОПУЛЯРНЫЙ</div>
+      <h3>Премиум</h3>
+      <div class="subtitle">Для тех, кто живёт своей дачей</div>
+      <div class="price" data-month="199 ₽" data-season="339 ₽" data-year="1 749 ₽">339 ₽<span class="period">/сезон</span></div>
+      <ul>
+        <li>2 участка по 20 соток</li>
+        <li>Неограниченные грядки</li>
+        <li>Умный прогноз погоды</li>
+        <li>Сверхточный расчёт теней (шаг 0,1 м, 20 новых расчётов в месяц)</li>
+        <li>Режим «Эксперт» с дополнительными настройками</li>
+        <li>Дневник урожая (2 фото на запись)</li>
+        <li>Ранний доступ к новым функциям</li>
+      </ul>
+      <button class="cta" onclick="pay('premium')">Оформить</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <h4>Контакты</h4>
+    <p>E-mail: <a href="mailto:bazhenavo@yandex.ru">bazhenavo@yandex.ru</a></p>
+    <p>ИНН: <strong>525404993014</strong> | Самозанятый</p>
+    <div class="docs">
+      <a href="#offer">Публичная оферта</a>
+      <a href="#privacy">Политика конфиденциальности</a>
+      <a href="#terms">Пользовательское соглашение</a>
+      <a href="#refund">Возврат средств</a>
+    </div>
+    <p style="margin-top:16px; font-size:0.85rem; color:#adb5bd;">© 2026 Навигатор садовода. Все права защищены.</p>
+  </div>
+
+  <!-- Legal: Public Offer -->
+  <span class="anchor" id="offer"></span>
+  <div class="legal">
+    <h2>Публичная оферта</h2>
+    <p><strong>1. Общие положения.</strong> Настоящая оферта является публичным предложением Исполнителя (самозанятый, ИНН: 525404993014) любому дееспособному физическому лицу (Заказчику) заключить договор оказания информационных услуг на условиях, изложенных ниже.</p>
+    <p><strong>2. Предмет договора.</strong> Исполнитель предоставляет Заказчику доступ к функционалу мобильного приложения «Навигатор садовода» в соответствии с выбранным тарифом (Стандарт, Премиум, Ультра) и периодом подписки (месяц, сезон, год).</p>
+    <p><strong>3. Цена и порядок оплаты.</strong> Стоимость услуг указана на сайте. Оплата производится через платёжный сервис Robokassa. Доступ активируется в течение 24 часов после подтверждения оплаты.</p>
+    <p><strong>4. Права и обязанности сторон.</strong> Исполнитель обязуется поддерживать работоспособность приложения в рамках выбранного тарифа. Заказчик обязуется не передавать доступ третьим лицам.</p>
+    <p><strong>5. Возврат средств.</strong> Возврат возможен в течение 14 дней с момента оплаты при условии, что доступ к функциям не был использован. Для оформления возврата напишите на bazhenavo@yandex.ru.</p>
+    <p><strong>6. Заключительные положения.</strong> Оферта вступает в силу с момента акцепта (оплаты). Исполнитель вправе изменять условия оферты в одностороннем порядке с уведомлением на сайте.</p>
+  </div>
+
+  <!-- Legal: Privacy Policy (updated 24.07.2026) -->
+  <span class="anchor" id="privacy"></span>
+  <div class="legal">
+    <h2>Политика конфиденциальности</h2>
+    <p><strong>Дата последнего обновления: 24 июля 2026 г.</strong></p>
+    <p>Настоящая Политика конфиденциальности объясняет, как мобильное приложение «Навигатор садовода» собирает, использует, хранит и защищает вашу информацию. Мы уважаем вашу конфиденциальность и обязуемся защищать ваши личные данные. Мы не продаём ваши данные рекламным агентствам и третьим лицам.</p>
+
+    <h3>1. Какую информацию мы собираем</h3>
+    <p><strong>1.1. Данные, которые вы предоставляете добровольно</strong></p>
+    <ul>
+      <li><strong>Адрес электронной почты (E-mail) и пароль:</strong> необходимы для создания учётной записи, сохранения данных в облаке и отправки чеков об оплате подписки.</li>
+      <li><strong>Пользовательские данные (контент):</strong> названия ваших грядок, растений, заметки о вкусовых качествах урожая, списки семян и инвентаря на складе.</li>
+      <li><strong>Фотографии:</strong> снимки урожая или упаковок семян, которые вы добровольно загружаете через камеру или галерею устройства.</li>
+    </ul>
+
+    <p><strong>1.2. Данные, собираемые автоматически (с вашего разрешения)</strong></p>
+    <ul>
+      <li><strong>Геопозиция (координаты):</strong> Приложение запрашивает доступ к геопозиции исключительно для определения погоды на участке и точного математического расчёта падения теней от объектов. Мы не отслеживаем ваше перемещение.</li>
+    </ul>
+
+    <h3>2. Как мы используем вашу информацию</h3>
+    <ul>
+      <li><strong>Синхронизация данных:</strong> сохранение плана участка и календаря для доступа с разных устройств.</li>
+      <li><strong>Расчёты:</strong> вычисление уровня освещённости и рекомендаций по поливу на основе прогноза погоды для ваших координат.</li>
+      <li><strong>Офлайн-режим:</strong> кэширование данных на устройстве, чтобы приложение работало без интернета.</li>
+      <li><strong>Улучшение сервиса:</strong> предоставление доступа к подпискам и премиум-функциям.</li>
+    </ul>
+
+    <h3>3. Как мы храним и защищаем данные</h3>
+    <ul>
+      <li><strong>Облачное хранение:</strong> данные учётных записей и база участков хранятся на защищённых серверах Supabase. Доступ ограничен политиками безопасности (Row Level Security) — данные видите только вы.</li>
+      <li><strong>Локальное хранение:</strong> в условиях отсутствия сети данные сохраняются в защищённую память устройства и отправляются на сервер при появлении интернета.</li>
+      <li><strong>Пароли:</strong> не хранятся в открытом виде, надёжно зашифрованы.</li>
+    </ul>
+
+    <h3>4. Передача данных третьим лицам</h3>
+    <ul>
+      <li><strong>Погодные и картографические сервисы (Open-Meteo, OpenStreetMap):</strong> анонимно передаются координаты (широта и долгота) для получения прогноза погоды. Личные данные (имя, email) не передаются.</li>
+      <li><strong>Платёжный шлюз Robokassa:</strong> при оформлении подписки ваш email передаётся в Robokassa для отправки электронного чека. Приложение не собирает, не видит и не хранит данные банковских карт. Безопасность платежей обеспечивается сервисом Robokassa в соответствии с требованиями PCI DSS.</li>
+    </ul>
+
+    <h3>5. Запросы разрешений на устройстве</h3>
+    <p>Мы строго соблюдаем принципы прозрачности при работе с функциями вашего устройства:</p>
+    <ul>
+      <li><strong>Минимальная необходимость:</strong> Приложение запрашивает только те разрешения, которые требуются для предоставляемого сервиса.</li>
+      <li><strong>Камера и Галерея:</strong> запрашиваются для добавления фотографий в «Дневник урожая» и на «Склад».</li>
+      <li><strong>Геолокация (GPS):</strong> запрашивается для автоматического определения координат участка (для расчёта теней и погоды).</li>
+      <li><strong>Уведомления:</strong> запрашиваются для локальных напоминаний о поливе и подкормке.</li>
+    </ul>
+    <p><strong>Наши гарантии при работе с разрешениями:</strong></p>
+    <ol>
+      <li><strong>Данные не для продажи:</strong> данные, полученные с разрешения пользователя (фотографии, координаты), не предназначены для продажи, распространения и передачи третьим лицам (за исключением технической и обезличенной передачи координат в погодный сервис).</li>
+      <li><strong>Никакого обхода настроек:</strong> получение разрешений не используется для обхода настроек конфиденциальности операционной системы.</li>
+      <li><strong>Активное согласие:</strong> согласие пользователя запрашивается в форме активного действия (через стандартные системные диалоги ОС). Мы не считаем согласием случайно закрытое окно или выход из диалога.</li>
+      <li><strong>Свобода выбора и альтернативы:</strong> если вы отказываете в предоставлении разрешения, мы уважаем ваш выбор и не стремимся переубедить через навязчивые уведомления. Приложение предоставляет альтернативы: при отказе от GPS — ввод населённого пункта вручную, при отказе от камеры — текстовые заметки без фото.</li>
+    </ol>
+    <p>Вы можете в любой момент изменить своё решение и отозвать или предоставить разрешения в системных настройках смартфона.</p>
+
+    <h3>6. Ваши права</h3>
+    <ul>
+      <li>Вы можете в любой момент изменить или удалить свои участки, грядки и задачи внутри приложения.</li>
+      <li>Вы имеете право запросить полное удаление аккаунта и всех связанных данных. Направьте запрос на <a href="mailto:bazhenavo@yandex.ru">bazhenavo@yandex.ru</a>.</li>
+    </ul>
+
+    <h3>7. Безопасность детей</h3>
+    <p>Приложение предназначено для широкой аудитории и является абсолютно безопасным. Оно не содержит сцен насилия, неприемлемого контента, азартных игр или скрытых покупок.</p>
+
+    <h3>8. Изменения в Политике</h3>
+    <p>Мы оставляем за собой право периодически обновлять данную Политику. В случае существенных изменений мы уведомим вас внутри приложения.</p>
+
+    <h3>9. Контакты</h3>
+    <p>Email технической поддержки: <a href="mailto:bazhenavo@yandex.ru">bazhenavo@yandex.ru</a></p>
+  </div>
+
+  <!-- Legal: Terms of Service -->
+  <span class="anchor" id="terms"></span>
+  <div class="legal">
+    <h2>Пользовательское соглашение</h2>
+    <p><strong>Дата вступления в силу: 24 июля 2026 г.</strong></p>
+    <p>Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует отношения между разработчиком мобильного приложения «Навигатор садовода» (далее — «Правообладатель») и любым физическим лицом, использующим данное приложение (далее — «Пользователь»).</p>
+    <p>Начав использование Приложения, Пользователь подтверждает, что ознакомился с условиями настоящего Соглашения и принимает их в полном объёме. Если вы не согласны с условиями, пожалуйста, прекратите использование Приложения.</p>
+
+    <h3>1. Предмет соглашения</h3>
+    <p><strong>1.1.</strong> Правообладатель предоставляет Пользователю простую (неисключительную) лицензию на использование Приложения по его прямому назначению на мобильном устройстве Пользователя в личных, некоммерческих целях.</p>
+    <p><strong>1.2.</strong> Приложение предоставляет инструменты для визуального планирования дачного участка, ведения электронного склада (семян, инвентаря), генерации задач по уходу и расчёта инсоляции (далее — «Сервис»).</p>
+
+    <h3>2. Учётная запись и безопасность</h3>
+    <p><strong>2.1.</strong> Для доступа к облачному сохранению данных и платным тарифам Пользователю необходимо создать учётную запись, используя адрес электронной почты и пароль.</p>
+    <p><strong>2.2.</strong> Пользователь обязуется предоставлять достоверные данные при регистрации и несёт ответственность за сохранность своего пароля.</p>
+    <p><strong>2.3.</strong> В случае утери доступа к учётной записи Пользователь может восстановить его через службу поддержки при подтверждении владения электронной почтой.</p>
+
+    <h3>3. Тарифы, порядок оплаты и подписки</h3>
+    <p><strong>3.1.</strong> Базовый функционал Приложения предоставляется бесплатно (тариф «Фримиум»).</p>
+    <p><strong>3.2.</strong> Пользователь имеет право расширить лимиты (количество участков, объектов на карте, фотографий в дневнике) и получить доступ к премиум-функциям, оплатив один из доступных тарифов: «Стандарт», «Премиум» или «Ультра».</p>
+    <p><strong>3.3. Порядок оплаты:</strong> все платежи осуществляются через защищённый платёжный шлюз Robokassa. Приложение не запрашивает, не собирает и не хранит реквизиты банковских карт Пользователя.</p>
+    <p><strong>3.4. Отсутствие автопродления:</strong> оплата тарифов осуществляется разовыми платежами за выбранный период (месяц, сезон, год). Автоматические списания (рекуррентные платежи) не применяются. По истечении оплаченного периода Пользователь самостоятельно принимает решение о продлении тарифа.</p>
+    <p><strong>3.5.</strong> В случае окончания платного тарифа данные Пользователя (участки, грядки, склад) не удаляются, однако доступ к добавлению новых объектов ограничивается лимитами бесплатного тарифа.</p>
+    <p><strong>3.6. Возрастные ограничения:</strong> оформляя платную подписку, Пользователь подтверждает и гарантирует, что достиг возраста 18 (восемнадцати) лет. Если Пользователь не достиг совершеннолетия, он вправе оплачивать тарифы только с разрешения и согласия своих законных представителей (родителей, усыновителей или попечителей) в соответствии с действующим законодательством. Правообладатель не несёт ответственности за совершение платежей несовершеннолетними лицами без согласия их законных представителей.</p>
+
+    <h3>4. Порядок возврата средств</h3>
+    <p><strong>4.1.</strong> В соответствии с законодательством о защите прав потребителей, право на возврат средств за предоставленное право использования программного обеспечения (цифрового контента) ограничено.</p>
+    <p><strong>4.2.</strong> Услуга по предоставлению доступа к платному тарифу считается оказанной в полном объёме в момент активации тарифа на учётной записи Пользователя.</p>
+    <p><strong>4.3. Исключения:</strong> возврат средств возможен в течение 14 дней с момента оплаты исключительно в случаях:</p>
+    <ul>
+      <li>Технического сбоя, по вине которого оплаченный тариф не был активирован.</li>
+      <li>Критических ошибок Приложения, не позволяющих использовать его по прямому назначению (при условии, что служба поддержки не может их устранить).</li>
+    </ul>
+    <p><strong>4.4.</strong> Для запроса на возврат Пользователь должен обратиться в службу поддержки по адресу: <a href="mailto:bazhenavo@yandex.ru">bazhenavo@yandex.ru</a>, приложив электронный чек об оплате. Заявки рассматриваются в течение 10 рабочих дней.</p>
+
+    <h3>5. Права и обязанности сторон</h3>
+    <p><strong>5.1. Пользователь имеет право:</strong></p>
+    <ul>
+      <li>Использовать Приложение в рамках выбранного тарифа.</li>
+      <li>Создавать, редактировать и удалять свои данные.</li>
+      <li>Обращаться в службу технической поддержки.</li>
+    </ul>
+    <p><strong>5.2. Пользователь обязуется:</strong></p>
+    <ul>
+      <li>Не использовать Приложение для противоправных действий.</li>
+      <li>Не пытаться декомпилировать, взламывать или вмешиваться в работу серверов и программного кода Приложения.</li>
+    </ul>
+    <p><strong>5.3. Правообладатель имеет право:</strong></p>
+    <ul>
+      <li>Вносить изменения в функционал, интерфейс и тарифы Приложения, предварительно уведомив об этом Пользователей.</li>
+      <li>Приостанавливать работу Приложения для проведения технических работ.</li>
+    </ul>
+
+    <h3>6. Отказ от гарантий и ограничение ответственности</h3>
+    <p><strong>6.1.</strong> Приложение предоставляется на условиях «как есть» (as is). Правообладатель не гарантирует, что Приложение будет соответствовать всем индивидуальным ожиданиям Пользователя или работать абсолютно бесперебойно на всех моделях устройств.</p>
+    <p><strong>6.2. Информационный характер:</strong> любые советы, графики полива, расчёты теней и рекомендации по севообороту, генерируемые Приложением, носят исключительно рекомендательный и справочный характер.</p>
+    <p><strong>6.3.</strong> Правообладатель не несёт ответственности за фактический результат сельскохозяйственной деятельности Пользователя, гибель растений, низкую урожайность или иные убытки, возникшие вследствие погодных условий, вредителей или применения рекомендаций Приложения на практике.</p>
+    <p><strong>6.4.</strong> Прогноз погоды и осадков предоставляется сторонними сервисами (Open-Meteo). Правообладатель не гарантирует 100% точность метеорологических данных.</p>
+
+    <h3>7. Интеллектуальная собственность</h3>
+    <p><strong>7.1.</strong> Весь дизайн, программный код, графика и логотипы Приложения являются интеллектуальной собственностью Правообладателя и защищены законом.</p>
+    <p><strong>7.2.</strong> Пользовательский контент (названия грядок, фотографии урожая) принадлежит Пользователю.</p>
+
+    <h3>8. Изменение Соглашения</h3>
+    <p><strong>8.1.</strong> Правообладатель оставляет за собой право вносить изменения в настоящее Соглашение. Новая редакция вступает в силу с момента её публикации в Приложении.</p>
+    <p><strong>8.2.</strong> Продолжение использования Приложения после изменения Соглашения означает согласие Пользователя с новыми условиями.</p>
+
+    <h3>9. Контакты</h3>
+    <p>По всем вопросам, связанным с настоящим Соглашением, технической поддержкой или возвратом средств, вы можете обращаться:</p>
+    <ul>
+      <li>E-mail: <a href="mailto:bazhenavo@yandex.ru">bazhenavo@yandex.ru</a></li>
+      <li>Правообладатель: Вожик Татьяна Сергеевна / Самозанятый</li>
+      <li>ИНН: 525404993014</li>
+    </ul>
+  </div>
+
+  <!-- Legal: Refund -->
+  <span class="anchor" id="refund"></span>
+  <div class="legal">
+    <h2>Возврат средств</h2>
+    <p>1. Возврат денежных средств за подписку осуществляется в течение 14 календарных дней с момента оплаты.</p>
+    <p>2. Условие возврата: доступ к платным функциям не был использован (нет записей в журнале активности).</p>
+    <p>3. Для оформления возврата отправьте письмо на <a href="mailto:bazhenavo@yandex.ru">bazhenavo@yandex.ru</a> с указанием даты оплаты, суммы и номера заказа (payment_id).</p>
+    <p>4. Срок рассмотрения заявки — до 10 рабочих дней. Деньги возвращаются тем же способом, которым была произведена оплата.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const PRICES = {
+    standard: { month: 99, season: 159, year: 849 },
+    premium:  { month: 199, season: 339, year: 1749 },
+    ultra:    { month: 349, season: 599, year: 2999 }
+  };
+  const DESCS = {
+    standard: 'Подписка Стандарт',
+    premium:  'Подписка Премиум',
+    ultra:    'Подписка Ультра'
+  };
+  let currentPeriod = 'season';
+
+  function setPeriod(p) {
+    currentPeriod = p;
+    document.querySelectorAll('.toggle button').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-'+p).classList.add('active');
+    const map = {month:'/мес', season:'/сезон', year:'/год'};
+    document.querySelectorAll('.price').forEach(el => {
+      el.innerHTML = el.getAttribute('data-'+p) + '<span class="period">'+map[p]+'</span>';
+    });
+  }
+
+  async function pay(tariff) {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'Переходим к оплате...';
+
+    const amount = PRICES[tariff][currentPeriod];
+    const desc = DESCS[tariff] + ' (' + (currentPeriod==='month'?'месяц':currentPeriod==='season'?'сезон':'год') + ')';
+
+    try {
+      const res = await fetch('https://xapiwzcrkpiwqtyfmbzx.supabase.co/functions/v1/yookassa-create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, description: desc, tariff, period: currentPeriod })
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        showToast('Ошибка: ' + (data.error || 'Не удалось создать платёж'));
+        btn.disabled = false;
+        btn.textContent = 'Оформить';
+      }
+    } catch (e) {
+      showToast('Ошибка соединения. Попробуйте позже.');
+      btn.disabled = false;
+      btn.textContent = 'Оформить';
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+
+</body>
+</html>'''
